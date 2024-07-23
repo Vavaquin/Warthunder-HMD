@@ -1,0 +1,196 @@
+@font-face {
+	font-family: 'icons';
+	src: url('icons.ttf') format('woff2'),
+		 url('icons.ttf') format('woff');
+	font-weight: normal;
+	font-style: normal;
+  }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font), Arial, sans-serif;
+	
+}
+
+a {
+    color: rgb(0, 255, 21);
+    text-decoration: none;
+}
+
+.imgb{
+    width: 140px;
+    margin-bottom: -5px;
+}
+
+
+
+.imgs{
+    width: 140px;
+    margin-bottom: -5px;
+}
+
+
+body {
+    overflow: hidden;
+    color: #00ff15;
+    font-family: 'VT323', sans-serif;
+    font-size: x-large;
+    text-shadow: 
+    -1px -1px 0 hwb(0 0% 100% / 0.301),  
+     1px -1px 0 hwb(0 0% 100% / 0.301),
+    -1px  1px 0 hwb(0 0% 100% / 0.301),
+     1px  1px 0 hwb(0 0% 100% / 0.301);
+
+}
+
+section{
+
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.flex-column{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: flex-start;
+}
+
+
+
+
+#dot{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+
+}
+.dot2{
+    position: absolute;
+    top: 0px;
+}
+
+#speed{
+    position: absolute;
+    left: 10vw;
+    text-align: center;
+}
+
+#ammo{
+    position: absolute;
+    right: 11vw;
+    text-align: center;
+    top: 2vw;
+}
+#alt{
+    position: absolute;
+    right: 10vw;
+}
+
+#compass{
+    text-align: center;
+    top: 0%;
+    left: 50%;
+    text-align: center;
+}
+
+#mira{
+    position: absolute;
+    height: 1px;
+    top: 52%;
+    left: 50%;
+    image-rendering: pixelated;
+    transform-origin: center center;  /* Define o ponto de ancoragem no centro */
+    transform: scale(20.5); /* Aumenta o tamanho */
+}
+
+#time{
+    text-align: center;
+    margin-top: 45vw;
+    left: 50%;
+    text-align: center;
+
+}
+#fuel{
+    position: absolute;
+    right: 0vw;
+    top: 22vw;
+}
+
+#arrow{
+    position: absolute;
+    top: 83%;
+    left: 0%;
+}
+#arrow2{
+    position: absolute;
+    top: 83%;
+    left: 0%;
+}
+
+#w1{
+    position: absolute;
+    top: 85%;
+    left: 0%;
+    transition: all 400ms;
+}
+#w2{
+    position: absolute;
+    top: 85%;
+    left: 0%;
+}
+
+.MFD1 {
+    position: absolute;
+    top: 90%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+.texto{
+    margin: 15px;
+}
+
+.margin{
+    margin: 500px;
+}
+
+.map{
+    border-radius: 50px;
+}
+
+.modelo{
+    padding: 17px;
+	align-self: center;
+}
+
+
+
+@media screen and (max-width: 814px) {
+    .coluna1{
+        flex-direction: column;
+    }
+}
+
+
+
+
