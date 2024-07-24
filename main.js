@@ -32,7 +32,7 @@ function createWindow() {
     mainWindow.setAlwaysOnTop(isOverlay);
     mainWindow.setResizable(!isOverlay);
     mainWindow.setMovable(!isOverlay);
-    mainWindow.setFocusable(!isOverlay);
+    // mainWindow.setFocusable(!isOverlay);
     mainWindow.webContents.send('toggle-overlay', isOverlay);
   });
 }

@@ -19,7 +19,8 @@ let currentData = {
     ammo_counter1: 0,
     aviahorizon_roll: 0,
     airbrake_indicator: 0,
-    radio_altitude: 0
+    radio_altitude: 0,
+    fuel_consume1: 0
 };
 
 let targetData = {
@@ -41,7 +42,8 @@ let targetData = {
     ammo_counter1: 0,
     aviahorizon_roll: 0,
     airbrake_indicator: 0,
-    radio_altitude: 0
+    radio_altitude: 0,
+    fuel_consume1: 0
 };
 
 let stopLoop = false;
@@ -59,6 +61,7 @@ function updateDisplay() {
     currentData.fuel = interpolate(currentData.fuel, targetData.fuel, alpha);
     currentData.weapon4 = interpolate(currentData.weapon4, targetData.weapon4, alpha);
     currentData.fuel_consume = interpolate(currentData.fuel_consume, targetData.fuel_consume, alpha);
+    currentData.fuel_consume1 = interpolate(currentData.fuel_consume1, targetData.fuel_consume1, alpha);
     currentData.nozzle_angle = interpolate(currentData.nozzle_angle, targetData.nozzle_angle, alpha);
     currentData.throttle = interpolate(currentData.throttle1, targetData.throttle, alpha);
     currentData.compass = interpolate(currentData.compass, targetData.compass, alpha);
@@ -166,16 +169,27 @@ function updateDisplay() {
 
 
 
-    
+    // // Calculo de combustivel
+    // if (currentData.fuel_consume > 0) {
+    //     const remainingMinutes = currentData.fuel / currentData.fuel_consume;
+    //     const minutes = Math.floor(remainingMinutes);
+    //     const seconds = Math.floor((remainingMinutes - minutes) * 60);
+    //     document.getElementById('time').innerText = `[${minutes}:${seconds.toString().padStart(2, '0')}]`;
+    // } else {
+    //     document.getElementById('time').innerText = "";
+    // }
 
 
+    let allfuelconsume = currentData.fuel_consume;
 
+    if (currentData.fuel_consume1) {
+        allfuelconsume += currentData.fuel_consume1;
+    }
 
-    // Calculo de combustivel
-    if (currentData.fuel_consume > 0) {
-        const remainingMinutes = currentData.fuel / currentData.fuel_consume;
+    if (allfuelconsume > 0) {
+        const remainingMinutes = currentData.fuel / allfuelconsume;
         const minutes = Math.floor(remainingMinutes);
-        const seconds = Math.floor((remainingMinutes - minutes) * 60);
+        const seconds = Math.floor((remainingMinutes - minutes) * 60)
         document.getElementById('time').innerText = `[${minutes}:${seconds.toString().padStart(2, '0')}]`;
     } else {
         document.getElementById('time').innerText = "";
@@ -209,6 +223,7 @@ async function fetchSpeed() {
         targetData.aviahorizon_roll = data.aviahorizon_roll;
         targetData.airbrake_indicator = data.airbrake_indicator;
         targetData.radio_altitude = data.radio_altitude;
+        targetData.fuel_consume1 = data.fuel_consume1;
 
         handleValidState(data.valid);
 
@@ -268,7 +283,8 @@ function resetScript() {
         ammo_counter1: 0,
         aviahorizon_roll: 0,
         airbrake_indicator: 0,
-        radio_altitude: 0
+        radio_altitude: 0,
+        fuel_consume1: 0
     };
 
 
