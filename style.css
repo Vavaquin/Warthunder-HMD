@@ -1,10 +1,3 @@
-@font-face {
-	font-family: 'icons';
-	src: url('icons.ttf') format('woff2'),
-		 url('icons.ttf') format('woff');
-	font-weight: normal;
-	font-style: normal;
-  }
 
 * {
     margin: 0;
@@ -109,13 +102,14 @@ section{
 }
 
 #mira{
+    display: none;
     position: absolute;
     height: 1px;
     top: 52%;
     left: 50%;
     image-rendering: pixelated;
-    transform-origin: center center;  /* Define o ponto de ancoragem no centro */
-    transform: scale(20.5); /* Aumenta o tamanho */
+    transform-origin: center center;  
+    transform: scale(20.5); 
 }
 
 #time{
@@ -154,6 +148,25 @@ section{
     left: 0%;
 }
 
+#brake {
+
+    position: absolute;
+    top: 90%;
+    right: 20%;
+}
+
+#g {
+    position: absolute;
+    top: 95%;
+    right: 20%;
+}
+
+#ralt{
+    position: absolute;
+    top: 58%;
+    right: 60%;
+}
+
 .MFD1 {
     position: absolute;
     top: 90%;
@@ -183,13 +196,6 @@ section{
 	align-self: center;
 }
 
-
-
-@media screen and (max-width: 814px) {
-    .coluna1{
-        flex-direction: column;
-    }
-}
 
 
 

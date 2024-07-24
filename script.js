@@ -17,7 +17,9 @@ let currentData = {
     aoa: 0,
     g_meter: 0,
     ammo_counter1: 0,
-    aviahorizon_roll: 0
+    aviahorizon_roll: 0,
+    airbrake_indicator: 0,
+    radio_altitude: 0
 };
 
 let targetData = {
@@ -37,7 +39,9 @@ let targetData = {
     aoa: 0,
     g_meter: 0,
     ammo_counter1: 0,
-    aviahorizon_roll: 0
+    aviahorizon_roll: 0,
+    airbrake_indicator: 0,
+    radio_altitude: 0
 };
 
 let stopLoop = false;
@@ -68,6 +72,7 @@ function updateDisplay() {
     currentData.ammo_counter1 = interpolate(currentData.ammo_counter1, targetData.ammo_counter1, alpha);
     currentData.type = targetData.type; 
     currentData.aviahorizon_roll = interpolate(currentData.aviahorizon_roll, targetData.aviahorizon_roll, alpha);
+    currentData.radio_altitude = interpolate(currentData.radio_altitude, targetData.radio_altitude, alpha);
 
     // document.getElementById('speed').innerText = `[${currentData.mach.toFixed(2)}]`;
     // document.getElementById('alt').innerText = `[${currentData.altitude_10k.toFixed(0)}]`;
@@ -135,6 +140,32 @@ function updateDisplay() {
         w2.style.display = 'none'
     }
 
+    if (targetData.airbrake_lever > 0.9001 || targetData.airbrake_indicator > 0.901) {
+        const brake = document.getElementById('brake');
+        brake.style.display = 'block';
+        document.getElementById('brake').innerText = `[AIR BRAKE!]`;
+    } else {
+        brake.style.display = 'none'
+    }
+
+    if (targetData.gear_c_indicator > 0.9001 || targetData.gear_lamp_down > 0.9001) {
+        const g = document.getElementById('g');
+        g.style.display = 'block';
+        document.getElementById('g').innerText = `[GEAR]`;
+    } else {
+        g.style.display = 'none'
+    }
+
+    if (targetData.radio_altitude > 1) {
+        const ralt = document.getElementById('ralt');
+        ralt.style.display = 'block';
+        document.getElementById('ralt').innerText = `R:[${currentData.radio_altitude.toFixed(0)}]`;
+    } else {
+        ralt.style.display = 'none'
+    }
+
+
+
     
 
 
@@ -176,6 +207,8 @@ async function fetchSpeed() {
         targetData.g_meter = data.g_meter;
         targetData.ammo_counter1 = data.ammo_counter1;
         targetData.aviahorizon_roll = data.aviahorizon_roll;
+        targetData.airbrake_indicator = data.airbrake_indicator;
+        targetData.radio_altitude = data.radio_altitude;
 
         handleValidState(data.valid);
 
@@ -233,7 +266,9 @@ function resetScript() {
         aoa: 0,
         g_meter: 0,
         ammo_counter1: 0,
-        aviahorizon_roll: 0
+        aviahorizon_roll: 0,
+        airbrake_indicator: 0,
+        radio_altitude: 0
     };
 
 
