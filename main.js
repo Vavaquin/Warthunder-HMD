@@ -26,6 +26,15 @@ function createWindow() {
     mainWindow = null;
   });
 
+  isOverlay = !isOverlay;
+  mainWindow.setIgnoreMouseEvents(isOverlay);
+  mainWindow.setAlwaysOnTop(isOverlay);
+  mainWindow.setResizable(!isOverlay);
+  mainWindow.setMovable(!isOverlay);
+  // mainWindow.setFocusable(!isOverlay);
+  mainWindow.webContents.send('toggle-overlay', isOverlay);
+  
+
   globalShortcut.register('F9', () => {
     isOverlay = !isOverlay;
     mainWindow.setIgnoreMouseEvents(isOverlay);
@@ -44,6 +53,8 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+
 
 app.on('activate', () => {
   if (mainWindow === null) {
