@@ -1,6 +1,7 @@
 // Script aproveitado do WTMFD
 
 let currentData = {
+    speed: 0,
     mach: 0,
     altitude_10k: 0,
     fuel: 0,
@@ -24,6 +25,7 @@ let currentData = {
 };
 
 let targetData = {
+    speed: 0,
     mach: 0,
     altitude_10k: 0,
     fuel: 0,
@@ -52,11 +54,23 @@ let abortController = new AbortController();
 function interpolate(current, target, alpha) {
     return current + (target - current) * alpha;
 }
+let underFiveMinutesTime = 0;
+let underTwoMinutesTime = 0;
+let lastCheckTime = Date.now();
+const audioBingo = new Audio('bingo.mp3');
+const audioFuel = new Audio('fuel.mp3');
+let lastAltitude = currentData.altitude_10k;
+let lastAltitudeCheckTime = Date.now();
+const audioSink = new Audio('sink.mp3');
+let altitudeAlertPlayed = false;
+const audioAltitude = new Audio('altitude.mp3');
+const audioStar = new Audio('star.mp3');
 
 function updateDisplay() {
     const alpha = 0.06; 
 
     currentData.mach = interpolate(currentData.mach, targetData.mach, alpha);
+    currentData.speed = interpolate(currentData.speed, targetData.speed, alpha);
     currentData.altitude_10k = interpolate(currentData.altitude_10k, targetData.altitude_10k, alpha);
     currentData.fuel = interpolate(currentData.fuel, targetData.fuel, alpha);
     currentData.weapon4 = interpolate(currentData.weapon4, targetData.weapon4, alpha);
@@ -95,6 +109,8 @@ function updateDisplay() {
     } else {
         document.getElementById('speed').innerText = "";
     }
+
+
 
     if (currentData.altitude_10k > 0) {
         document.getElementById('alt').innerText = `[${currentData.altitude_10k.toFixed(0)}]`;
@@ -186,15 +202,99 @@ function updateDisplay() {
         allfuelconsume += currentData.fuel_consume1;
     }
 
+    if (allfuelconsume > 0.2 && !starSoundPlayed) {
+        audioStar.play();
+        starSoundPlayed = true; // Marca como tocado
+    }
+
+    if (allfuelconsume <= 0.2) {
+        starSoundPlayed = false;
+    }
+
     if (allfuelconsume > 0) {
         const remainingMinutes = currentData.fuel / allfuelconsume;
         const minutes = Math.floor(remainingMinutes);
-        const seconds = Math.floor((remainingMinutes - minutes) * 60)
+        const seconds = Math.floor((remainingMinutes - minutes) * 60);
         document.getElementById('time').innerText = `[${minutes}:${seconds.toString().padStart(2, '0')}]`;
+
+        const currentTime = Date.now();
+        const elapsedTime = (currentTime - lastCheckTime) / 1000;
+
+        if (remainingMinutes < 5) {
+            underFiveMinutesTime += elapsedTime;
+            if (underFiveMinutesTime > 1) {
+                audioFuel.play();
+                underFiveMinutesTime = 0; 
+                document.getElementById('time').style.color = '#fffb00';
+            }
+        } else {
+            underFiveMinutesTime = 0;
+        }
+
+
+        if (remainingMinutes < 2) {
+            underTwoMinutesTime += elapsedTime;
+            if (underTwoMinutesTime > 1) {
+                audioBingo.play();
+                underTwoMinutesTime = 0; 
+                document.getElementById('time').style.color = 'red';
+            }
+        } else {
+            underTwoMinutesTime = 0;
+            document.getElementById('time').style.color = '#00ff15';
+        }
+
+        lastCheckTime = currentTime;
+
     } else {
         document.getElementById('time').innerText = "";
     }
+
+
+
+
+    const currentAltitudeCheckTime = Date.now();
+    const elapsedTime = (currentAltitudeCheckTime - lastAltitudeCheckTime) / 1000; // 1000ms
+
+    const altitudeDifference = lastAltitude - currentData.altitude_10k;
+    const descentRatePerMinute = (altitudeDifference / elapsedTime) * 60; // 
+
+    if (descentRatePerMinute > 70000) {
+        audioSink.play();
+    }
+
+
+    lastAltitude = currentData.altitude_10k;
+    lastAltitudeCheckTime = currentAltitudeCheckTime;
+
+    if (currentData.radio_altitude < 1000 && !altitudeAlertPlayed) {
+        audioAltitude.play();
+        altitudeAlertPlayed = true;
+    }
+
+ 
+    if (currentData.radio_altitude >= 1200) {
+        altitudeAlertPlayed = false;
+    }
+
+
+
+    if (currentData.altitude_10k < 1000 && !altitudeAlertPlayed) {
+        audioAltitude.play();
+        altitudeAlertPlayed = true; // Marca como tocado
+    }
+
+ 
+    if (currentData.altitude_10k >= 1200) {
+        altitudeAlertPlayed = false;
+    }
+
+
+
+
 }
+
+
 
 async function fetchSpeed() {
     try {
@@ -224,6 +324,7 @@ async function fetchSpeed() {
         targetData.airbrake_indicator = data.airbrake_indicator;
         targetData.radio_altitude = data.radio_altitude;
         targetData.fuel_consume1 = data.fuel_consume1;
+        targetData.speed = data.speed;
 
         handleValidState(data.valid);
 
@@ -266,6 +367,7 @@ function resetScript() {
 
     // Reset do sscript
     currentData = {
+        speed: 0,
         mach: 0,
         altitude_10k: 0,
         fuel: 0,
