@@ -21,7 +21,9 @@ let currentData = {
     aviahorizon_roll: 0,
     airbrake_indicator: 0,
     radio_altitude: 0,
-    fuel_consume1: 0
+    fuel_consume1: 0,
+    rpm: 0,
+    rpm1: 0
 };
 
 let targetData = {
@@ -45,7 +47,9 @@ let targetData = {
     aviahorizon_roll: 0,
     airbrake_indicator: 0,
     radio_altitude: 0,
-    fuel_consume1: 0
+    fuel_consume1: 0,
+    rpm: 0,
+    rpm1: 0
 };
 
 let stopLoop = false;
@@ -65,6 +69,27 @@ const audioSink = new Audio('sink.mp3');
 let altitudeAlertPlayed = false;
 const audioAltitude = new Audio('altitude.mp3');
 const audioStar = new Audio('star.mp3');
+
+// Radar altimetro de pouso
+const audio200 = new Audio('200.mp3');
+const audio100 = new Audio('100.mp3');
+const audio50 = new Audio('50.mp3');
+const audio40 = new Audio('40.mp3');
+const audio30 = new Audio('30.mp3');
+const audio20 = new Audio('20.mp3');
+const audio10 = new Audio('10.mp3');
+const audioCaution = new Audio('caution.mp3');
+
+
+let audioPlayed200 = true;
+let audioPlayed100 = true;
+let audioPlayed50 = true;
+let audioPlayed40 = true;
+let audioPlayed30 = true;
+let audioPlayed20 = true;
+let audioPlayed10 = true;
+let cautionPlayed = false;
+let cautionRpmPlayed = true;
 
 function updateDisplay() {
     const alpha = 0.06; 
@@ -90,6 +115,8 @@ function updateDisplay() {
     currentData.type = targetData.type; 
     currentData.aviahorizon_roll = interpolate(currentData.aviahorizon_roll, targetData.aviahorizon_roll, alpha);
     currentData.radio_altitude = interpolate(currentData.radio_altitude, targetData.radio_altitude, alpha);
+    currentData.rpm = interpolate(currentData.rpm, targetData.rpm, alpha);
+    currentData.rpm1 = interpolate(currentData.rpm1, targetData.rpm1, alpha);
 
     // document.getElementById('speed').innerText = `[${currentData.mach.toFixed(2)}]`;
     // document.getElementById('alt').innerText = `[${currentData.altitude_10k.toFixed(0)}]`;
@@ -288,9 +315,78 @@ function updateDisplay() {
     if (currentData.altitude_10k >= 1200) {
         altitudeAlertPlayed = false;
     }
+    if (currentData.gear_c_indicator > 0.9 || targetData.gear_lamp_down > 0.9) {
 
+        if (currentData.radio_altitude <= 200 && !audioPlayed200) {
+            audio200.play();
+            audioPlayed200 = true;
+        }
+        if (currentData.radio_altitude <= 100 && !audioPlayed100) {
+            audio100.play();
+            audioPlayed100 = true;
+        }
+        if (currentData.radio_altitude <= 50 && !audioPlayed50) {
+            audio50.play();
+            audioPlayed50 = true;
+        }
+        if (currentData.radio_altitude <= 40 && !audioPlayed40) {
+            audio40.play();
+            audioPlayed40 = true;
+        }
+        if (currentData.radio_altitude <= 30 && !audioPlayed30) {
+            audio30.play();
+            audioPlayed30 = true;
+        }
+        if (currentData.radio_altitude <= 20 && !audioPlayed20) {
+            audio20.play();
+            audioPlayed20 = true;
+        }
+        if (currentData.radio_altitude <= 10 && !audioPlayed10) {
+            audio10.play();
+            audioPlayed10 = true;
+        }
+    }
 
+    // Reset da altitude
+    if (currentData.radio_altitude > 300) {
+        audioPlayed200 = false;
+    }
+    if (currentData.radio_altitude > 200) {
+        audioPlayed100 = false;
+    }
+    if (currentData.radio_altitude > 80) {
+        audioPlayed50 = false;
+    }
+    if (currentData.radio_altitude > 60) {
+        audioPlayed40 = false;
+    }
+    if (currentData.radio_altitude > 50) {
+        audioPlayed30 = false;
+    }
+    if (currentData.radio_altitude > 30) {
+        audioPlayed20 = false;
+    }
+    if (currentData.radio_altitude > 30) {
+        audioPlayed10 = false;
+    }
 
+    if (Math.abs(currentData.rpm - currentData.rpm1) >= 500 && !cautionPlayed) {
+        audioCaution.play();
+        cautionPlayed = true;
+    }
+
+    if (Math.abs(currentData.rpm - currentData.rpm1) < 500) {
+        cautionPlayed = false;
+    }
+
+    if (currentData.rpm < 100 && currentData.radio_altitude > 1000 && !cautionRpmPlayed) {
+        audioCaution.play();
+        cautionRpmPlayed = true;
+    }
+    
+    if (!(currentData.rpm < 100 && currentData.radio_altitude > 1000)) {
+        cautionRpmPlayed = false;
+    }
 
 }
 
@@ -325,6 +421,8 @@ async function fetchSpeed() {
         targetData.radio_altitude = data.radio_altitude;
         targetData.fuel_consume1 = data.fuel_consume1;
         targetData.speed = data.speed;
+        targetData.rpm = data.rpm;
+        targetData.rpm1 = data.rpm1;
 
         handleValidState(data.valid);
 
@@ -339,6 +437,13 @@ async function fetchSpeed() {
 function handleValidState(valid) {
     if (valid && !hasReceivedTrue) {
         resetScript();
+        audioPlayed200 = true;
+        audioPlayed100 = true;
+        audioPlayed50 = true;
+        audioPlayed40 = true;
+        audioPlayed30 = true;
+        audioPlayed20 = true;
+        audioPlayed10 = true;
         hasReceivedTrue = true;
     } else if (!valid) {
         hasReceivedTrue = false;
@@ -386,7 +491,9 @@ function resetScript() {
         aviahorizon_roll: 0,
         airbrake_indicator: 0,
         radio_altitude: 0,
-        fuel_consume1: 0
+        fuel_consume1: 0,
+        rpm: 0,
+        rpm1: 0
     };
 
 
