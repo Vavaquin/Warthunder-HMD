@@ -67,6 +67,7 @@ let lastAltitude = currentData.altitude_10k;
 let lastAltitudeCheckTime = Date.now();
 const audioSink = new Audio('sink.mp3');
 let altitudeAlertPlayed = false;
+let altitudeR = false;
 const audioAltitude = new Audio('altitude.mp3');
 const audioStar = new Audio('star.mp3');
 
@@ -296,25 +297,14 @@ function updateDisplay() {
 
     if (currentData.radio_altitude < 1000 && !altitudeAlertPlayed) {
         audioAltitude.play();
-        altitudeAlertPlayed = true;
+        altitudeR = true;
     }
 
  
     if (currentData.radio_altitude >= 1200) {
-        altitudeAlertPlayed = false;
+        altitudeR = false;
     }
 
-
-
-    if (currentData.altitude_10k < 1000 && !altitudeAlertPlayed) {
-        audioAltitude.play();
-        altitudeAlertPlayed = true; // Marca como tocado
-    }
-
- 
-    if (currentData.altitude_10k >= 1200) {
-        altitudeAlertPlayed = false;
-    }
     if (currentData.gear_c_indicator > 0.9 || targetData.gear_lamp_down > 0.9) {
 
         if (currentData.radio_altitude <= 200 && !audioPlayed200) {
@@ -383,7 +373,7 @@ function updateDisplay() {
         audioCaution.play();
         cautionRpmPlayed = true;
     }
-    
+
     if (!(currentData.rpm < 100 && currentData.radio_altitude > 1000)) {
         cautionRpmPlayed = false;
     }
