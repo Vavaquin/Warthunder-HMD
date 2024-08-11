@@ -295,7 +295,7 @@ function updateDisplay() {
     lastAltitude = currentData.altitude_10k;
     lastAltitudeCheckTime = currentAltitudeCheckTime;
 
-    if (currentData.radio_altitude < 1000 && !altitudeAlertPlayed) {
+    if (currentData.radio_altitude < 1000 && !altitudeR) {
         audioAltitude.play();
         altitudeR = true;
     }
