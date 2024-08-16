@@ -94,29 +94,6 @@ let audioPlayed10 = true;
 let cautionPlayed = false;
 let cautionRpmPlayed = true;
 
-function interpolateCompass(current, target, alpha) {
-    let diff = target - current;
-
-    if (Math.abs(diff) > 180) {
-        if (diff > 0) {
-            diff -= 360;
-        } else {
-            diff += 360;
-        }
-    }
-
-    let result = current + diff * alpha;
-
- 
-    if (result < 0) {
-        result += 360;
-    } else if (result >= 360) {
-        result -= 360;
-    }
-
-    return result;
-}
-
 function updateDisplay() {
     const alpha = 0.06; 
 
@@ -129,7 +106,7 @@ function updateDisplay() {
     currentData.fuel_consume1 = interpolate(currentData.fuel_consume1, targetData.fuel_consume1, alpha);
     currentData.nozzle_angle = interpolate(currentData.nozzle_angle, targetData.nozzle_angle, alpha);
     currentData.throttle = interpolate(currentData.throttle1, targetData.throttle, alpha);
-    currentData.compass = interpolateCompass(currentData.compass, targetData.compass, alpha); 
+    currentData.compass = interpolate(currentData.compass, targetData.compass, alpha);
     currentData.gears = interpolate(currentData.gears, targetData.gears, alpha);
     currentData.gear_lamp_down = interpolate(currentData.gear_lamp_down, targetData.gear_lamp_down, alpha);
     currentData.gear_c_indicator = interpolate(currentData.gear_c_indicator, targetData.gear_c_indicator, alpha);
@@ -532,122 +509,79 @@ window.onload = () => {
     });
 };
 
-
-let compass = 0;  
-let radarData = [];  
-let scale = 600.0;  
+let compass = 0;  // Valor inicial do compass
 
 document.addEventListener("DOMContentLoaded", function() {
     const radar = document.getElementById('radar1');
-    const radarContainer = document.getElementById('radar-container'); // Referência ao container do radar
-    const radarSize = 200;
-    const radarRadius = radarSize / 2;
+    const radarSize = 400;
+    let scale = 500.0;  // Escala inicial
 
-    const bussulaImg = document.createElement('img');
-    bussulaImg.src = 'bussola.png';
-    bussulaImg.classList.add('bussula-image');
-    bussulaImg.style.position = 'absolute';
-    bussulaImg.style.width = `${radarSize}px`; 
-    bussulaImg.style.height = `${radarSize}px`;
-    bussulaImg.style.left = '0px';
-    bussulaImg.style.top = '0px';
-    bussulaImg.style.zIndex = '4'; // Abaixo do player
-    radarContainer.appendChild(bussulaImg);
-
-    function updateRadarVisual() {
-        radar.innerHTML = ''; 
-        let centerX, centerY;
-
-        bussulaImg.style.transform = `rotate(${compass * -1}deg)`;
-
-        
-        radarData.forEach(obj => {
-            if (obj.icon === 'Player') {
-                centerX = obj.x;
-                centerY = obj.y;
-            }
-        });
-
-        
-
-     
-        const playerImg = document.createElement('img');
-        playerImg.src = 'compassplane.png';  
-        playerImg.classList.add('player-image');  
-        playerImg.style.position = 'absolute';
-        playerImg.style.width = '20px';            
-        playerImg.style.height = '20px';        
-        playerImg.style.left = `${radarRadius - 5}px`;  
-        playerImg.style.top = `${radarRadius - 5}px`;   
-        playerImg.style.zIndex = '5';
-        radar.appendChild(playerImg);
-
-        radarData.forEach(obj => {
-            if (obj.icon === 'Player') return; 
-
-  
-            const x = ((obj.x - centerX) * scale);
-            const y = ((obj.y - centerY) * scale);
-
-           
-            const rad = (Math.PI / 180) * (360 - compass);
-            let rotatedX = x * Math.cos(rad) - y * Math.sin(rad);
-            let rotatedY = x * Math.sin(rad) + y * Math.cos(rad);
-
-            const distance = Math.sqrt(rotatedX ** 2 + rotatedY ** 2);
-            if (distance > radarRadius) {
-                const ratio = radarRadius / distance;
-                rotatedX *= ratio;
-                rotatedY *= ratio;
-            }
-
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            dot.style.left = `${rotatedX + radarRadius}px`;
-            dot.style.top = `${rotatedY + radarRadius}px`;
-
-            if (obj.color) {
-                dot.style.backgroundColor = obj.color; 
-            }
-
-            if (obj.blink) {
-                dot.style.animation = `blink ${obj.blink}s infinite alternate`; 
-            }
-
-            radar.appendChild(dot);
-        });
-    }
-
-    function fetchRadarData() {
-       
+    function updateRadar() {
+        // Fetch dos dados do radar
         fetch('http://localhost:8111/map_obj.json')
             .then(response => response.json())
             .then(data => {
-                radarData = data;  
-                radarContainer.style.transition = 'background-color 1ms';
-                radarContainer.style.backgroundColor = 'rgba(0, 200, 0, 0.5)';  
-                setTimeout(() => {
-                    radarContainer.style.transition = 'background-color 1200ms';
-                    radarContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.01)';
-                }, 50);  
-            })
-            .catch(error => {
-                console.error('Erro ao buscar dados do radar:', error);
+                radar.innerHTML = ''; // Limpa os pontos anteriores
+                let centerX, centerY;
+
+                data.forEach(obj => {
+                    if (obj.icon === 'Player') {
+                        centerX = obj.x;
+                        centerY = obj.y;
+                    }
+                });
+
+                // Adiciona um ponto verde fixo no centro do radar para representar o player
+                const playerDot = document.createElement('div');
+                playerDot.classList.add('dot');
+                playerDot.style.backgroundColor = 'green';  // Define a cor verde
+                playerDot.style.left = `${radarSize / 2}px`;  // Centraliza horizontalmente
+                playerDot.style.top = `${radarSize / 2}px`;   // Centraliza verticalmente
+                radar.appendChild(playerDot);
+
+                data.forEach(obj => {
+                    if (obj.icon === 'Player') return;
+
+                    // Aplicando a escala
+                    const x = ((obj.x - centerX) * scale);
+                    const y = ((obj.y - centerY) * scale);
+
+                    // Ajuste da rotação com inversão do compass (360 - compass)
+                    const rad = (Math.PI / 180) * (360 - compass);
+                    const rotatedX = x * Math.cos(rad) - y * Math.sin(rad);
+                    const rotatedY = x * Math.sin(rad) + y * Math.cos(rad);
+
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    dot.style.left = `${rotatedX + radarSize / 2}px`;
+                    dot.style.top = `${rotatedY + radarSize / 2}px`;
+
+                    if (obj.color) {
+                        dot.style.backgroundColor = obj.color;
+                    }
+
+                    if (obj.blink) {
+                        dot.style.animation = `blink ${obj.blink}s infinite alternate`;
+                    }
+
+                    radar.appendChild(dot);
+                });
             });
+
+        // Fetch do valor do compass
+
     }
 
-    // inutil por enquanto
+    // Atualiza o radar a cada 1000ms (1 segundo)
+    setInterval(updateRadar, 1000);
 
-    setInterval(fetchRadarData, 3000);
-    setInterval(updateRadarVisual, 100);
+    // Funções para aumentar ou diminuir a escala
     function increaseScale() {
-        scale *= 1.1;  
-        updateRadarVisual();  
+        scale *= 1.1;  // Aumenta a escala em 10%
     }
 
     function decreaseScale() {
-        scale *= 0.9; 
-        updateRadarVisual();  
+        scale *= 0.9;  // Diminui a escala em 10%
     }
 
     // Adiciona eventos para botões de controle de escala
