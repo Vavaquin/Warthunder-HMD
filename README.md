@@ -8,4 +8,13 @@ HMD Warthunder is an overlay system for Warthunder that puts the most important 
 
 It has adaptive information; for example, if the aircraft cannot provide flight time, this information will not occupy the screen. It supports variable wing geometry and VTOL.
 
+PS: The game needs to be in borderless window mode.
+
+
+
+
+
+
+
+
 
