@@ -584,6 +584,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         radarData.forEach(obj => {
             if (obj.icon === 'Player') return; 
+            if (obj.type === "aircraft") return; 
 
   
             const x = ((obj.x - centerX) * scale);
