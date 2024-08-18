@@ -584,7 +584,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         radarData.forEach(obj => {
             if (obj.icon === 'Player') return; 
-            if (obj.type === "aircraft") return; 
+            if (obj.type === "aircraft") return; //ignora aeronaves - no aircraft displayed
+            if (obj.type === "ground_model") return; //ignora ground tropas - no tanks displayed
+            
 
   
             const x = ((obj.x - centerX) * scale);
