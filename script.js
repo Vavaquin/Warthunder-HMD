@@ -12,6 +12,7 @@ let currentData = {
     type: "",
     nozzle_angle: 0,
     compass: 0,
+    compass1: 0,
     gears: 0,
     gear_c_indicator: 0,
     blister1: 0,
@@ -38,6 +39,7 @@ let targetData = {
     type: "",
     nozzle_angle: 0,
     compass: 0,
+    compass1: 0,
     gears: 0,
     gear_c_indicator: 0,
     blister1: 0,
@@ -69,7 +71,7 @@ let lastAltitude = currentData.altitude_10k;
 let lastAltitudeCheckTime = Date.now();
 const audioSink = new Audio('sink.mp3');
 let altitudeAlertPlayed = false;
-let altitudeR = false;
+let altitudeR = true;
 const audioAltitude = new Audio('altitude.mp3');
 const audioStar = new Audio('star.mp3');
 
@@ -130,6 +132,7 @@ function updateDisplay() {
     currentData.nozzle_angle = interpolate(currentData.nozzle_angle, targetData.nozzle_angle, alpha);
     currentData.throttle = interpolate(currentData.throttle1, targetData.throttle, alpha);
     currentData.compass = interpolateCompass(currentData.compass, targetData.compass, alpha); 
+    currentData.compass1 = interpolateCompass(currentData.compass1, targetData.compass1, alpha); 
     currentData.gears = interpolate(currentData.gears, targetData.gears, alpha);
     currentData.gear_lamp_down = interpolate(currentData.gear_lamp_down, targetData.gear_lamp_down, alpha);
     currentData.gear_c_indicator = interpolate(currentData.gear_c_indicator, targetData.gear_c_indicator, alpha);
@@ -143,7 +146,13 @@ function updateDisplay() {
     currentData.radio_altitude = interpolate(currentData.radio_altitude, targetData.radio_altitude, alpha);
     currentData.rpm = interpolate(currentData.rpm, targetData.rpm, alpha);
     currentData.rpm1 = interpolate(currentData.rpm1, targetData.rpm1, alpha);
-    compass = currentData.compass; // Atribuindo o valor à variável global
+
+    // compass = currentData.compass; // Atribuindo o valor à variável global
+    if (typeof targetData.compass === 'undefined' || targetData.compass === null) {
+        compass = currentData.compass1; 
+    } else {
+        compass = currentData.compass;
+    }
 
     // document.getElementById('speed').innerText = `[${currentData.mach.toFixed(2)}]`;
     // document.getElementById('alt').innerText = `[${currentData.altitude_10k.toFixed(0)}]`;
@@ -424,6 +433,7 @@ async function fetchSpeed() {
         targetData.throttle = data.throttle;
         targetData.wing_sweep_indicator = data.wing_sweep_indicator;
         targetData.compass = data.compass;
+        targetData.compass1 = data.compass1;
         targetData.gears = data.gears;
         targetData.gear_c_indicator = data.gear_c_indicator;
         targetData.gear_lamp_down = data.gear_lamp_down;
@@ -499,6 +509,7 @@ function resetScript() {
         type: "",
         nozzle_angle: 0,
         compass: 0,
+        compass1: 0,
         gears: 0,
         gear_c_indicator: 0,
         blister1: 0,
